@@ -1,6 +1,8 @@
 import os
+
+import isodate as isodate
+import datetime
 from googleapiclient.discovery import build
-# import isodate
 
 
 class PlayList:
@@ -21,10 +23,18 @@ class PlayList:
         self.title = self.playlists_info["items"][0]["snippet"]["title"]
         self.url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
 
+    @property
     def total_duration(self):
-        pass
+        """Возвращает объект класса `datetime.timedelta` с суммарной длительность плейлиста"""
+        count_time = datetime.timedelta()
+        for video in self.video_response['items']:
+            iso_8601_duration = video['contentDetails']['duration']
+            duration = isodate.parse_duration(iso_8601_duration)
+            count_time += duration
+        return count_time
 
     def show_best_video(self):
+        """Возвращает ссылку на самое популярное видео из плейлиста (по количеству лайков)"""
         max_liked = 0
         most_liked_video = 0
         for video in self.video_response['items']:
