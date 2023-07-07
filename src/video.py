@@ -7,15 +7,21 @@ class Video:
 
     def __init__(self, video_id):
         """Экземпляр инициализируется id видео. Дальше все данные будут подтягиваться по API."""
-        self.API_KEY = os.getenv('YT_API_KEY')
-        self.youtube = build('youtube', 'v3', developerKey=self.API_KEY)
-        self.video_id = video_id
-        self.video = self.youtube.videos().list(id=self.video_id,
-                                                part='snippet,statistics,contentDetails,topicDetails').execute()
-        self.title = self.video["items"][0]["snippet"]["title"]
-        self.url = f"https://www.youtube.com/channel/{self.video_id}"
-        self.viewers = self.video["items"][0]["statistics"]["viewCount"]
-        self.likes = int(self.video["items"][0]["statistics"]["likeCount"])
+        try:
+            self.API_KEY = os.getenv('YT_API_KEY')
+            self.youtube = build('youtube', 'v3', developerKey=self.API_KEY)
+            self.video_id = video_id
+            self.video = self.youtube.videos().list(id=self.video_id,
+                                                    part='snippet,statistics,contentDetails,topicDetails').execute()
+            self.title = self.video["items"][0]["snippet"]["title"]
+            self.url = f"https://www.youtube.com/channel/{self.video_id}"
+            self.viewers = self.video["items"][0]["statistics"]["viewCount"]
+            self.like_count = int(self.video["items"][0]["statistics"]["likeCount"])
+        except Exception:
+            self.title = None
+            self.like_count = None
+            self.viewers = None
+            self.url = None
 
     def __str__(self):
         return self.title
